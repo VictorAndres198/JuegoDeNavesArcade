@@ -17,5 +17,22 @@ void Dibujar(){
     naveespacial();
     asteroide();
     dibujarDisparos();
+
+    // Dibujar puntaje
+    glColor3f(1.0f, 1.0f, 1.0f);  // Color blanco
+    glRasterPos2f(-18.0f, 18.0f);  // Posición del texto
+    string puntajeStr = "Puntaje: " + to_string(puntaje);
+    for (char c : puntajeStr) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);  // Fuente y tamaño del texto
+    }
+
+    // Dibujar vidas
+    string vidasStr = "Vidas: " + to_string(vidas);
+    glRasterPos2f(10.0f, 18.0f);  // Posición del texto
+    for (char c : vidasStr) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, c);  // Fuente y tamaño del texto
+    }
+
     glFlush();
 }
+

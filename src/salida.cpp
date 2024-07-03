@@ -1,38 +1,38 @@
 #include "funciones.h"
 #include <cmath>
 #include <cstdlib>
+#include <cstring>  // Para memset
 
 // PARTE DEL ASTEROIDE PARA DARLE UNA FORMA FIJA LUEGO DE CREARLO
 #include <vector>
-
 struct Vertice {
     float x, y;
 };
-
 std::vector<Vertice> verticesAsteroide;
-// HASTA ACA ES LA PARTE DEL ASTEROIDE
-
-
-
-float mover_x = 0;
-float mover_y = -15;
-
-
-
 float angulo_asteroide = 0.0f;
-
 float mover_x_asteroide = 10.0f;
 float mover_y_asteroide = 20.0f;  // Inicializar el asteroide arriba de la pantalla
-
-
 float velocidad_y_asteroide = 0.0f;  // Declarar la velocidad de bajada del asteroide
+//****************************************************************************
 
+// PARTE DE MOVIMIENTO
+float mover_x = 0;
+float mover_y = -15;
+//// *****************
+
+
+// ============ PARTE DE MOVIMIENTO FLUIDO ===============================
+float velocidad_x = 0.0f;
+float velocidad_y = 0.0f;
+float aceleracion = 0.1f;  // Ajusta la aceleración según sea necesario
+float desaceleracion = 0.05f;  // Ajusta la desaceleración según sea necesario
+bool teclas[256];
+bool teclasEspeciales[256];
+
+//****************************************************************************
 
 
 //============== PARTE DE DISPAROS =====================
-
-
-
 
 Disparo disparos[MAX_DISPAROS];  // Arreglo de disparos
 
@@ -54,12 +54,6 @@ void dibujarDisparos() {
     }
 }
 
-
-
-
-
-
-
 void disparar() {
     for (int i = 0; i < MAX_DISPAROS; ++i) {
         if (!disparos[i].activo) {
@@ -70,15 +64,40 @@ void disparar() {
         }
     }
 }
-
+// parte de movimiento fluido
 void teclado(unsigned char key, int x, int y) {
-    switch (key) {
-        case ' ':  // Tecla de espacio para disparar
-            disparar();  // Llamar a la función disparar() para activar un disparo
-            break;
-    }
+    teclas[key] = true;
 }
 
+void liberarTecla(unsigned char key, int x, int y) {
+    teclas[key] = false;
+}
+
+void tecladoEspecial(int key, int x, int y) {
+    teclasEspeciales[key] = true;
+}
+
+void liberarTeclaEspecial(int key, int x, int y) {
+    teclasEspeciales[key] = false;
+}
+
+void actualizar(int valor) {
+    // Movimiento más fluido de la nave
+    if (teclasEspeciales[GLUT_KEY_RIGHT]) mover_x += 0.5f;
+    if (teclasEspeciales[GLUT_KEY_LEFT]) mover_x -= 0.5f;
+    if (teclasEspeciales[GLUT_KEY_UP]) mover_y += 0.5f;
+    if (teclasEspeciales[GLUT_KEY_DOWN]) mover_y -= 0.5f;
+
+    // Disparar cuando se presiona la barra espaciadora
+    if (teclas[' ']) disparar();
+
+    // Volver a dibujar la escena
+    glutPostRedisplay();
+
+    // Configurar la próxima llamada a esta función
+    glutTimerFunc(16, actualizar, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
+}
+//*******************************************
 
 
 void actualizarDisparos(int valor) {
@@ -101,6 +120,7 @@ void actualizarDisparos(int valor) {
                     // Si la distancia es menor que un umbral, hay colisión
                     if (distancia < 0.5f) {  // Ajusta este umbral según el tamaño del asteroide
                         disparos[i].activo = false;  // Desactivar el disparo
+                        puntaje += 10;  // Incrementar el puntaje por destruir un asteroide
                         generarAsteroide();  // Regenerar el asteroide
                         break;  // Salir del bucle de vértices
                     }
@@ -115,13 +135,12 @@ void actualizarDisparos(int valor) {
     // Configurar la próxima llamada a esta función
     glutTimerFunc(16, actualizarDisparos, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
 }
+// *****************************************************************************************
 
-
-
-
-
-
-
+// PARTE DE LAS VIDAS Y PUNTAJE
+int puntaje = 0;
+int vidas = 3;  // Inicializa con la cantidad de vidas que desees
+// ***************************
 
 
 void planoCartesiano(){
@@ -218,9 +237,6 @@ void naveespacial() {
 
 }
 
-
-
-
 void asteroide(){
     glPushMatrix();
     glTranslatef(mover_x_asteroide, mover_y_asteroide, 0.0f);
@@ -235,7 +251,6 @@ void asteroide(){
 
     glPopMatrix();
 }
-
 
 void generarAsteroide() {
     verticesAsteroide.clear();
@@ -259,20 +274,25 @@ void generarAsteroide() {
     }
 }
 
-
-
 void actualizarAsteroide(int valor) {
     // Mover el asteroide hacia abajo con la velocidad calculada
     mover_y_asteroide -= velocidad_y_asteroide;
 
-    // Cuando el asteroide sale de la pantalla, restablecer su posición
+    // Cuando el asteroide sale de la pantalla, restablecer su posición y restar una vida
     if (mover_y_asteroide < -20.0f) {
-        // Regenerar el asteroide y su velocidad
-        generarAsteroide();
+        vidas--;  // Decrementar las vidas
+        generarAsteroide();  // Regenerar el asteroide
     }
 
     // Incrementar el ángulo de rotación del asteroide
     angulo_asteroide += 0.5f;  // Ajusta la velocidad de rotación según lo necesites
+
+    // Verificar si se han agotado las vidas
+    if (vidas <= 0) {
+        // Aquí puedes manejar el final del juego, reiniciar puntaje, vidas, etc.
+        puntaje = 0;
+        vidas = 3;
+    }
 
     // Volver a dibujar la escena
     glutPostRedisplay();
@@ -280,9 +300,3 @@ void actualizarAsteroide(int valor) {
     // Configurar la próxima llamada a esta función
     glutTimerFunc(16, actualizarAsteroide, 0);
 }
-
-
-
-
-
-

@@ -1,7 +1,10 @@
 #include "funciones.h"
 
+#include <GL/glut.h>
+#include "funciones.h"
+
 int main(int argc, char** argv){
-    cout << "!!!Bienvenidos!!!" << endl;
+    std::cout << "!!!Bienvenidos!!!" << std::endl;
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(800, 600);
@@ -11,11 +14,13 @@ int main(int argc, char** argv){
     generarAsteroide();  // Generar la forma del asteroide una vez
 
     glutDisplayFunc(Dibujar);
-    glutSpecialFunc(traslado);
-    glutKeyboardFunc(teclado);  // Registrar la función de teclado para manejar las teclas presionadas
+    glutSpecialFunc(tecladoEspecial);  // Registrar función para teclas especiales
+    glutSpecialUpFunc(liberarTeclaEspecial);  // Registrar función para liberar teclas especiales
+    glutKeyboardFunc(teclado);  // Registrar función para teclas normales
+    glutKeyboardUpFunc(liberarTecla);  // Registrar función para liberar teclas normales
 
-    glutTimerFunc(16, actualizarAsteroide, 0);  // Llamar a la función de actualización del asteroide cada 16 ms (~60 FPS)
-
+    glutTimerFunc(16, actualizarAsteroide, 0);  // Llamar a la función de actualización del asteroide cada 16 ms
+    glutTimerFunc(16, actualizar, 0);  // Llamar a la función de actualización del juego cada 16 ms (~60 FPS)
 
     // Inicializar disparos y otros elementos
     for (int i = 0; i < MAX_DISPAROS; ++i) {
@@ -28,3 +33,4 @@ int main(int argc, char** argv){
     glutMainLoop();
     return 0;
 }
+

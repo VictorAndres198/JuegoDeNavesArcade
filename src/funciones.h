@@ -18,9 +18,19 @@ struct Disparo {
 };
 extern Disparo disparos[MAX_DISPAROS];  // Declarar el arreglo de disparos como externo
 
+extern int puntaje;
+extern int vidas;
+
+
+void actualizar(int valor);
+void teclado(unsigned char key, int x, int y);
+void liberarTecla(unsigned char key, int x, int y);
+void tecladoEspecial(int key, int x, int y);
+void liberarTeclaEspecial(int key, int x, int y);
 
 void Inicializar();
 void planoCartesiano();
+void actualizarNave();
 void traslado(int, int, int);
 void Dibujar();
 void naveespacial();
