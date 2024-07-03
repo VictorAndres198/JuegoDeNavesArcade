@@ -1,14 +1,31 @@
 #include "funciones.h"
-#include <vector>  // Incluimos la cabecera vector
-#include <algorithm>  // Incluimos la cabecera algorithm
+#include <cmath>
+#include <cstdlib>
+
+// PARTE DEL ASTEROIDE PARA DARLE UNA FORMA FIJA LUEGO DE CREARLO
+#include <vector>
+
+struct Vertice {
+    float x, y;
+};
+
+std::vector<Vertice> verticesAsteroide;
+// HASTA ACA ES LA PARTE DEL ASTEROIDE
+
+
 
 float mover_x = 0;
 float mover_y = -15;
 
-float angulo = 0.0f;
 
-//vector<Proyectil> proyectiles;
-//vector<Asteroide> asteroides;
+
+float angulo_asteroide = 0.0f;
+
+float mover_x_asteroide = 10.0f;
+float mover_y_asteroide = 20.0f;  // Inicializar el asteroide arriba de la pantalla
+
+
+float velocidad_y_asteroide = 0.0f;  // Declarar la velocidad de bajada del asteroide
 
 void planoCartesiano(){
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -66,106 +83,67 @@ void naveespacial() {
 }
 
 void asteroide(){
+    glPushMatrix();
+    glTranslatef(mover_x_asteroide, mover_y_asteroide, 0.0f);
+    glRotatef(angulo_asteroide, 0.0f, 0.0f, 1.0f);
+
     glColor3f(1.0f, 1.0f, 1.0f);
-	glBegin(GL_QUADS);
-		glVertex2f(-1.0f, -1.0f);
-		glVertex2f(1.0f, -1.0f);
-		glVertex2f(1.0f, 1.0f);
-		glVertex2f(-1.0f, 1.0f);
-	glEnd();
-}
-
-/*
-void Disparo(unsigned char key, int x, int y) {
-    if (key == 32) {  // Tecla de espacio
-        CrearProyectil();
-    }
-}
-
-void CrearProyectil() {
-    Proyectil nuevoProyectil;
-    nuevoProyectil.x = mover_x;
-    nuevoProyectil.y = mover_y + 4.0f;  // La posición inicial del proyectil
-    proyectiles.push_back(nuevoProyectil);
-}
-
-void MoverProyectiles() {
-    glColor3f(1.0f, 1.0f, 0.0f);
-    for (auto& proyectil : proyectiles) {
-        proyectil.y += 0.1f;
-        glBegin(GL_QUADS);
-            glVertex2f(proyectil.x - 0.1f, proyectil.y);
-            glVertex2f(proyectil.x + 0.1f, proyectil.y);
-            glVertex2f(proyectil.x + 0.1f, proyectil.y + 0.5f);
-            glVertex2f(proyectil.x - 0.1f, proyectil.y + 0.5f);
-        glEnd();
-    }
-    glutPostRedisplay();
-}
-
-void CrearAsteroide() {
-    Asteroide nuevoAsteroide;
-    nuevoAsteroide.x = (rand() % 40) - 20;
-    nuevoAsteroide.y = 20.0f;
-    nuevoAsteroide.angulo = 0.0f;
-    asteroides.push_back(nuevoAsteroide);
-}
-
-void MoverAsteroides() {
-    glColor3f(0.5f, 0.5f, 0.5f);
-    for (auto& asteroide : asteroides) {
-        asteroide.y -= 0.05f;
-        asteroide.angulo += 1.0f;
-        glPushMatrix();
-        glTranslatef(asteroide.x, asteroide.y, 0);
-        glRotatef(asteroide.angulo, 0, 0, 1);
-        glBegin(GL_QUADS);
-            glVertex2f(-1.0f, -1.0f);
-            glVertex2f(1.0f, -1.0f);
-            glVertex2f(1.0f, 1.0f);
-            glVertex2f(-1.0f, 1.0f);
-        glEnd();
-        glPopMatrix();
-    }
-    glutPostRedisplay();
-}
-
-void DibujarExplosión(float x, float y) {
-    glColor3f(1.0f, 0.5f, 0.0f);
-    glBegin(GL_QUADS);
-        glVertex2f(x - 0.5f, y - 0.5f);
-        glVertex2f(x + 0.5f, y - 0.5f);
-        glVertex2f(x + 0.5f, y + 0.5f);
-        glVertex2f(x - 0.5f, y + 0.5f);
-    glEnd();
-}
-
-void CheckCollisions() {
-    for (auto itP = proyectiles.begin(); itP != proyectiles.end(); ++itP) {
-        for (auto itA = asteroides.begin(); itA != asteroides.end(); ++itA) {
-            if (itP->x > itA->x - 1.0f && itP->x < itA->x + 1.0f &&
-                itP->y > itA->y - 1.0f && itP->y < itA->y + 1.0f) {
-                // Si hay una colisión
-                DibujarExplosión(itA->x, itA->y);
-                itA = asteroides.erase(itA);  // Eliminar asteroide
-                itP = proyectiles.erase(itP);  // Eliminar proyectil
-                break;  // Salir del bucle interior para evitar invalidar el iterador
-            }
+    glBegin(GL_POLYGON);
+        for (const auto& vertice : verticesAsteroide) {
+            glVertex2f(vertice.x, vertice.y);
         }
+    glEnd();
+
+    glPopMatrix();
+}
+
+
+void generarAsteroide() {
+    verticesAsteroide.clear();
+
+    // Generar una posición aleatoria en el eje x
+    mover_x_asteroide = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
+
+    // Restablecer la posición inicial del asteroide arriba de la pantalla
+    mover_y_asteroide = 20.0f;
+
+    // Generar una velocidad de bajada aleatoria entre 0.15f y 0.3f
+    velocidad_y_asteroide = 0.15f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.3f - 0.15f)));
+
+    // Generar los vértices del asteroide
+    for(int i = 0; i < 8; ++i) {
+        float angle = 2.0f * M_PI * i / 8;
+        float radius = 1.0f + (rand() % 100) / 100.0f * 0.5f; // Radio entre 1.0 y 1.5
+        float x = radius * cos(angle);
+        float y = radius * sin(angle);
+        verticesAsteroide.push_back({x, y});
+    }
+}
+
+
+
+void actualizarAsteroide(int valor) {
+    // Mover el asteroide hacia abajo con la velocidad calculada
+    mover_y_asteroide -= velocidad_y_asteroide;
+
+    // Cuando el asteroide sale de la pantalla, restablecer su posición
+    if (mover_y_asteroide < -20.0f) {
+        // Regenerar el asteroide y su velocidad
+        generarAsteroide();
     }
 
-    // Eliminar proyectiles que están fuera de la pantalla
-    proyectiles.erase(
-        remove_if(proyectiles.begin(), proyectiles.end(), [](const Proyectil& p) { return p.y > 20.0f; }),
-        proyectiles.end()
-    );
+    // Incrementar el ángulo de rotación del asteroide
+    angulo_asteroide += 0.5f;  // Ajusta la velocidad de rotación según lo necesites
 
-    // Eliminar asteroides que están fuera de la pantalla
-    asteroides.erase(
-        remove_if(asteroides.begin(), asteroides.end(), [](const Asteroide& a) { return a.y < -20.0f; }),
-        asteroides.end()
-    );
-
+    // Volver a dibujar la escena
     glutPostRedisplay();
+
+    // Configurar la próxima llamada a esta función
+    glutTimerFunc(16, actualizarAsteroide, 0);
 }
-*/
+
+
+
+
+
+

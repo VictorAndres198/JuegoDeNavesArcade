@@ -11,7 +11,6 @@ void Dibujar(){
     glClear(GL_COLOR_BUFFER_BIT);
     planoCartesiano();
     naveespacial();
-    //MoverProyectiles();//MoverAsteroides();//CheckCollisions();
     asteroide();
     glFlush();
 }
