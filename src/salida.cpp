@@ -27,6 +27,87 @@ float mover_y_asteroide = 20.0f;  // Inicializar el asteroide arriba de la panta
 
 float velocidad_y_asteroide = 0.0f;  // Declarar la velocidad de bajada del asteroide
 
+
+
+//============== PARTE DE DISPAROS =====================
+
+
+
+
+Disparo disparos[MAX_DISPAROS];  // Arreglo de disparos
+
+void dibujarDisparos() {
+    glColor3f(1.0f, 1.0f, 1.0f);  // Color blanco para los disparos
+
+    for (int i = 0; i < MAX_DISPAROS; ++i) {
+        if (disparos[i].activo) {
+            glPushMatrix();
+            glTranslatef(disparos[i].x, disparos[i].y, 0.0f);
+            glBegin(GL_QUADS);
+                glVertex2f(-0.1f, 0.0f);
+                glVertex2f(0.1f, 0.0f);
+                glVertex2f(0.1f, 0.5f);
+                glVertex2f(-0.1f, 0.5f);
+            glEnd();
+            glPopMatrix();
+        }
+    }
+}
+
+
+
+
+
+
+
+void disparar() {
+    for (int i = 0; i < MAX_DISPAROS; ++i) {
+        if (!disparos[i].activo) {
+            disparos[i].x = mover_x;  // Posición inicial del disparo en x (posición de la nave)
+            disparos[i].y = mover_y + 2.8f;  // Posición inicial del disparo en y (posición de la nave)
+            disparos[i].activo = true;
+            break;
+        }
+    }
+}
+
+void teclado(unsigned char key, int x, int y) {
+    switch (key) {
+        case ' ':  // Tecla de espacio para disparar
+            disparar();  // Llamar a la función disparar() para activar un disparo
+            break;
+    }
+}
+
+
+
+void actualizarDisparos(int valor) {
+    for (int i = 0; i < MAX_DISPAROS; ++i) {
+        if (disparos[i].activo) {
+            // Mover el disparo hacia arriba en el eje Y
+            disparos[i].y += 1.0f;  // Ajusta la velocidad de movimiento hacia arriba según sea necesario
+
+            // Verificar si el disparo ha salido de la pantalla
+            if (disparos[i].y > 20.0f) {
+                disparos[i].activo = false;  // Desactivar el disparo si sale de la pantalla
+            }
+        }
+    }
+
+    // Volver a dibujar la escena
+    glutPostRedisplay();
+
+    // Configurar la próxima llamada a esta función
+    glutTimerFunc(16, actualizarDisparos, 0);  // Llamar de nuevo a esta función cada 16 ms
+}
+
+
+
+
+
+
+
+
 void planoCartesiano(){
     glColor3f(1.0f, 1.0f, 1.0f);
 
