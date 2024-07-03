@@ -90,6 +90,21 @@ void actualizarDisparos(int valor) {
             // Verificar si el disparo ha salido de la pantalla
             if (disparos[i].y > 20.0f) {
                 disparos[i].activo = false;  // Desactivar el disparo si sale de la pantalla
+            } else {
+                // Verificar colisión con el asteroide
+                for (const auto& vertice : verticesAsteroide) {
+                    // Calcular distancia al vértice del asteroide
+                    float dx = disparos[i].x - (mover_x_asteroide + vertice.x);
+                    float dy = disparos[i].y - (mover_y_asteroide + vertice.y);
+                    float distancia = sqrt(dx * dx + dy * dy);
+
+                    // Si la distancia es menor que un umbral, hay colisión
+                    if (distancia < 0.5f) {  // Ajusta este umbral según el tamaño del asteroide
+                        disparos[i].activo = false;  // Desactivar el disparo
+                        generarAsteroide();  // Regenerar el asteroide
+                        break;  // Salir del bucle de vértices
+                    }
+                }
             }
         }
     }
@@ -98,8 +113,9 @@ void actualizarDisparos(int valor) {
     glutPostRedisplay();
 
     // Configurar la próxima llamada a esta función
-    glutTimerFunc(16, actualizarDisparos, 0);  // Llamar de nuevo a esta función cada 16 ms
+    glutTimerFunc(16, actualizarDisparos, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
 }
+
 
 
 
