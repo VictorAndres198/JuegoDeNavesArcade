@@ -83,10 +83,10 @@ void liberarTeclaEspecial(int key, int x, int y) {
 
 void actualizar(int valor) {
     // Movimiento más fluido de la nave
-    if (teclasEspeciales[GLUT_KEY_RIGHT]) mover_x += 0.5f;
-    if (teclasEspeciales[GLUT_KEY_LEFT]) mover_x -= 0.5f;
-    if (teclasEspeciales[GLUT_KEY_UP]) mover_y += 0.5f;
-    if (teclasEspeciales[GLUT_KEY_DOWN]) mover_y -= 0.5f;
+    if (teclasEspeciales[GLUT_KEY_RIGHT] && mover_x < 18.0f) mover_x += 0.5f;
+    if (teclasEspeciales[GLUT_KEY_LEFT] && mover_x > -18.0f) mover_x -= 0.5f;
+    if (teclasEspeciales[GLUT_KEY_UP] && mover_y < 16.5f) mover_y += 0.5f;
+    if (teclasEspeciales[GLUT_KEY_DOWN] && mover_y > -19.0f) mover_y -= 0.5f;
 
     // Disparar cuando se presiona la barra espaciadora
     if (teclas[' ']) disparar();
@@ -97,6 +97,7 @@ void actualizar(int valor) {
     // Configurar la próxima llamada a esta función
     glutTimerFunc(16, actualizar, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
 }
+
 //*******************************************
 
 
