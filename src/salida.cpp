@@ -8,7 +8,19 @@
 struct Vertice {
     float x, y;
 };
+
+struct Asteroide {
+    vector<Vertice> vertices;
+    float angulo;
+    float mover_x;
+    float mover_y;
+    float velocidad_y;
+
+    Asteroide() : angulo(0.0f), mover_x(0.0f), mover_y(20.0f), velocidad_y(0.0f) {}
+};
+std::vector<Asteroide> asteroides;
 std::vector<Vertice> verticesAsteroide;
+
 float angulo_asteroide = 0.0f;
 float mover_x_asteroide = 10.0f;
 float mover_y_asteroide = 20.0f;  // Inicializar el asteroide arriba de la pantalla
@@ -111,19 +123,29 @@ void actualizarDisparos(int valor) {
             if (disparos[i].y > 20.0f) {
                 disparos[i].activo = false;  // Desactivar el disparo si sale de la pantalla
             } else {
-                // Verificar colisión con el asteroide
-                for (const auto& vertice : verticesAsteroide) {
-                    // Calcular distancia al vértice del asteroide
-                    float dx = disparos[i].x - (mover_x_asteroide + vertice.x);
-                    float dy = disparos[i].y - (mover_y_asteroide + vertice.y);
-                    float distancia = sqrt(dx * dx + dy * dy);
+                // Verificar colisión con los asteroides
+                bool colision = false;
+                for (auto& ast : asteroides) {
+                    for (const auto& vertice : ast.vertices) {
+                        // Calcular distancia al vértice del asteroide
+                        float dx = disparos[i].x - (ast.mover_x + vertice.x);
+                        float dy = disparos[i].y - (ast.mover_y + vertice.y);
+                        float distancia = sqrt(dx * dx + dy * dy);
 
-                    // Si la distancia es menor que un umbral, hay colisión
-                    if (distancia < 0.5f) {  // Ajusta este umbral según el tamaño del asteroide
-                        disparos[i].activo = false;  // Desactivar el disparo
-                        puntaje += 10;  // Incrementar el puntaje por destruir un asteroide
-                        generarAsteroide();  // Regenerar el asteroide
-                        break;  // Salir del bucle de vértices
+                        // Si la distancia es menor que un umbral, hay colisión
+                        if (distancia < 1.0f) {  // Ajusta este umbral según el tamaño del asteroide
+                            disparos[i].activo = false;  // Desactivar el disparo
+                            colision = true;
+                            // Aumentar el puntaje por destruir un asteroide
+                            puntaje += 10;
+                            break;  // Salir del bucle de vértices
+                        }
+                    }
+                    if (colision) {
+                        // Eliminar el asteroide de la lista
+                        ast = asteroides.back();
+                        asteroides.pop_back();
+                        break;  // Salir del bucle de asteroides
                     }
                 }
             }
@@ -136,6 +158,8 @@ void actualizarDisparos(int valor) {
     // Configurar la próxima llamada a esta función
     glutTimerFunc(16, actualizarDisparos, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
 }
+
+
 // *****************************************************************************************
 
 // PARTE DE LAS VIDAS Y PUNTAJE
@@ -205,23 +229,43 @@ void naveespacial() {
     glEnd();
 
     // Propulsor medio
-    glColor3f(0.0f, 0.5f, 1.0f);  // Azul claro brillante
+    if (teclasEspeciales[GLUT_KEY_UP]) {
+        glColor3f(1.0f, 0.7f, 0.0f);  // Amarillo (simula fuego o propulsión similar al sol)
+    } else {
+        glColor3f(0.0f, 0.0f, 0.0f);  // Negro (propulsor apagado)
+    }
     glBegin(GL_TRIANGLES);
-        glVertex2f(-0.3f, 0.0f);
-        glVertex2f(0.3f, 0.0f);
-        glVertex2f(0.0f, -0.5f);
+        glVertex2f(-0.2f, -0.5f);
+        glVertex2f(0.2f, -0.5f);
+        glVertex2f(0.0f, -1.0f);
     glEnd();
+
     // Propulsor derecho
+    if (teclasEspeciales[GLUT_KEY_UP]) {
+        glColor3f(1.0f, 0.7f, 0.0f);  // Amarillo (simula fuego o propulsión similar al sol)
+    } else if (teclasEspeciales[GLUT_KEY_LEFT]) {
+        glColor3f(1.0f, 0.7f, 0.0f);  // Amarillo (simula fuego o propulsión similar al sol)
+    } else {
+        glColor3f(0.0f, 0.0f, 0.0f);  // Negro (propulsor apagado)
+    }
     glBegin(GL_TRIANGLES);
-        glVertex2f(0.3f, 0.0f);
-        glVertex2f(0.8f, 0.0f);
-        glVertex2f(0.55f, -0.5f);
+        glVertex2f(0.4f, -0.5f);
+        glVertex2f(0.7f, -0.5f);
+        glVertex2f(0.55f, -1.0f);
     glEnd();
+
     // Propulsor izquierdo
+    if (teclasEspeciales[GLUT_KEY_UP]) {
+        glColor3f(1.0f, 0.7f, 0.0f);  // Amarillo (simula fuego o propulsión similar al sol)
+    } else if (teclasEspeciales[GLUT_KEY_RIGHT]) {
+        glColor3f(1.0f, 0.7f, 0.0f);  // Amarillo (simula fuego o propulsión similar al sol)
+    } else {
+        glColor3f(0.0f, 0.0f, 0.0f);  // Negro (propulsor apagado)
+    }
     glBegin(GL_TRIANGLES);
-         glVertex2f(-0.3f, 0.0f);
-         glVertex2f(-0.8f, 0.0f);
-         glVertex2f(-0.55f, -0.5f);
+         glVertex2f(-0.4f, -0.5f);
+         glVertex2f(-0.7f, -0.5f);
+         glVertex2f(-0.55f, -1.0f);
     glEnd();
 
 
@@ -234,59 +278,122 @@ void naveespacial() {
         glVertex2f(-0.2f, 2.0f);
     glEnd();
 
-    glPopMatrix();
 
+    // Ventanas en la parte inferior
+    	glColor3f(0.6f, 0.6f, 0.6f);  // Azul claro
+        glBegin(GL_QUADS);
+            glVertex2f(-0.3f, -0.0f);
+            glVertex2f(0.3f, -0.0f);
+            glVertex2f(0.2f, -0.5f);
+            glVertex2f(-0.2f, -0.5f);
+        glEnd();
+
+        glBegin(GL_QUADS);
+            glVertex2f(-0.8f, -0.0f);
+            glVertex2f(-0.3f, -0.0f);
+            glVertex2f(-0.4f, -0.5f);
+            glVertex2f(-0.7f, -0.5f);
+        glEnd();
+
+        glBegin(GL_QUADS);
+            glVertex2f(0.8f, -0.0f);
+            glVertex2f(0.3f, -0.0f);
+            glVertex2f(0.4f, -0.5f);
+            glVertex2f(0.7f, -0.5f);
+        glEnd();
+
+    glPopMatrix();
 }
 
-void asteroide(){
-    glPushMatrix();
-    glTranslatef(mover_x_asteroide, mover_y_asteroide, 0.0f);
-    glRotatef(angulo_asteroide, 0.0f, 0.0f, 1.0f);
 
-    glColor3f(0.5f, 0.5f, 0.4f);  // Grisáceo con ligero tinte marrón
-    glBegin(GL_POLYGON);
-        for (const auto& vertice : verticesAsteroide) {
-            glVertex2f(vertice.x, vertice.y);
+
+void asteroide() {
+    for (const auto& ast : asteroides) {
+        glPushMatrix();
+        glTranslatef(ast.mover_x, ast.mover_y, 0.0f);
+        glRotatef(ast.angulo, 0.0f, 0.0f, 1.0f);
+
+        glColor3f(0.5f, 0.5f, 0.4f);  // Grisáceo con ligero tinte marrón
+        glBegin(GL_POLYGON);
+            for (const auto& vertice : ast.vertices) {
+                glVertex2f(vertice.x, vertice.y);
+            }
+        glEnd();
+
+        glPopMatrix();
+    }
+}
+
+// Función para generar asteroides
+void generarAsteroides() {
+    asteroides.clear();
+    int numAsteroides = rand() % 3 + 1;  // Generar entre 1 y 3 asteroides
+
+    for (int i = 0; i < numAsteroides; ++i) {
+        Asteroide nuevoAsteroide;
+
+        // Generar una posición aleatoria en el eje x
+        nuevoAsteroide.mover_x = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
+        nuevoAsteroide.mover_y = 20.0f;  // Restablecer la posición inicial del asteroide arriba de la pantalla
+        nuevoAsteroide.velocidad_y = 0.15f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.3f - 0.15f)));  // Generar una velocidad de bajada aleatoria
+
+        // Generar los vértices del asteroide
+        for (int j = 0; j < 8; ++j) {
+            float angle = 2.0f * M_PI * j / 8;
+            float radius = 1.0f + (rand() % 100) / 100.0f * 0.5f; // Radio entre 1.0 y 1.5
+            float x = radius * cos(angle);
+            float y = radius * sin(angle);
+            nuevoAsteroide.vertices.push_back({x, y});
         }
-    glEnd();
 
-    glPopMatrix();
-}
-
-void generarAsteroide() {
-    verticesAsteroide.clear();
-
-    // Generar una posición aleatoria en el eje x
-    mover_x_asteroide = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
-
-    // Restablecer la posición inicial del asteroide arriba de la pantalla
-    mover_y_asteroide = 20.0f;
-
-    // Generar una velocidad de bajada aleatoria entre 0.15f y 0.3f
-    velocidad_y_asteroide = 0.15f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.3f - 0.15f)));
-
-    // Generar los vértices del asteroide
-    for(int i = 0; i < 8; ++i) {
-        float angle = 2.0f * M_PI * i / 8;
-        float radius = 1.0f + (rand() % 100) / 100.0f * 0.5f; // Radio entre 1.0 y 1.5
-        float x = radius * cos(angle);
-        float y = radius * sin(angle);
-        verticesAsteroide.push_back({x, y});
+        asteroides.push_back(nuevoAsteroide);
     }
 }
 
 void actualizarAsteroide(int valor) {
-    // Mover el asteroide hacia abajo con la velocidad calculada
-    mover_y_asteroide -= velocidad_y_asteroide;
+    // Vector para almacenar asteroides que siguen activos
+    std::vector<Asteroide> asteroidesActivos;
 
-    // Cuando el asteroide sale de la pantalla, restablecer su posición y restar una vida
-    if (mover_y_asteroide < -20.0f) {
-        vidas--;  // Decrementar las vidas
-        generarAsteroide();  // Regenerar el asteroide
+    for (auto& ast : asteroides) {
+        // Mover el asteroide hacia abajo con la velocidad calculada
+        ast.mover_y -= ast.velocidad_y;
+
+        // Verificar colisión con la nave
+        float distancia_nave_asteroide = sqrt(pow(mover_x - ast.mover_x, 2) + pow(mover_y - ast.mover_y, 2));
+        if (distancia_nave_asteroide < 3.0f) {  // Ajusta este umbral según el tamaño de la nave y el asteroide
+            vidas--;  // Reducir una vida
+            // Eliminar el asteroide de la lista al colisionar con la nave
+            continue;  // Salir del ciclo actual de asteroides y no agregarlo a la lista de activos
+        }
+
+        // Verificar si el asteroide está aún en la pantalla
+        if (ast.mover_y > -20.0f) {
+            asteroidesActivos.push_back(ast);  // Mantener el asteroide activo
+        }
     }
 
-    // Incrementar el ángulo de rotación del asteroide
-    angulo_asteroide += 0.5f;  // Ajusta la velocidad de rotación según lo necesites
+    // Actualizar la lista de asteroides activos
+    asteroides = asteroidesActivos;
+
+    // Si no hay suficientes asteroides activos, generar más
+    while (asteroides.size() < 3) {  // Genera hasta un máximo de 3 asteroides activos
+        Asteroide nuevoAsteroide;
+        // Configurar nuevo asteroide con posiciones y características aleatorias
+        nuevoAsteroide.mover_x = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
+        nuevoAsteroide.mover_y = 20.0f;  // Comienza arriba de la pantalla
+        nuevoAsteroide.velocidad_y = 0.15f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.3f - 0.15f)));
+
+        // Generar los vértices del asteroide
+        for (int j = 0; j < 8; ++j) {
+            float angle = 2.0f * M_PI * j / 8;
+            float radius = 1.0f + (rand() % 100) / 100.0f * 0.5f; // Radio entre 1.0 y 1.5
+            float x = radius * cos(angle);
+            float y = radius * sin(angle);
+            nuevoAsteroide.vertices.push_back({x, y});
+        }
+
+        asteroides.push_back(nuevoAsteroide);
+    }
 
     // Verificar si se han agotado las vidas
     if (vidas <= 0) {
@@ -301,3 +408,6 @@ void actualizarAsteroide(int valor) {
     // Configurar la próxima llamada a esta función
     glutTimerFunc(16, actualizarAsteroide, 0);
 }
+
+
+

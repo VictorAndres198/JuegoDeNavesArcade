@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <GL/glut.h>  // Incluir GLUT para OpenGL
+#include <vector>
 
 using namespace std;
 
@@ -21,6 +22,8 @@ extern Disparo disparos[MAX_DISPAROS];  // Declarar el arreglo de disparos como 
 extern int puntaje;
 extern int vidas;
 
+void generarAsteroides();
+
 
 void actualizar(int valor);
 void teclado(unsigned char key, int x, int y);
@@ -37,7 +40,6 @@ void naveespacial();
 void asteroide();
 // Prototipo de la función de actualización del asteroide
 void actualizarAsteroide(int valor);
-void generarAsteroide();
 void teclado(unsigned char key, int x, int y);  // Declaración de teclado
 void dibujarDisparos();
 void actualizarDisparos(int valor);

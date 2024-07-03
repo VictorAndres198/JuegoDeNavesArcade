@@ -1,7 +1,6 @@
 #include "funciones.h"
 
 #include <GL/glut.h>
-#include "funciones.h"
 
 int main(int argc, char** argv){
     std::cout << "!!!Bienvenidos!!!" << std::endl;
@@ -11,7 +10,7 @@ int main(int argc, char** argv){
     glutCreateWindow("Juego Arcade de Naves Espaciales");
     Inicializar();
 
-    generarAsteroide();  // Generar la forma del asteroide una vez
+    generarAsteroides();  // Generar la forma de los asteroides una vez
 
     glutDisplayFunc(Dibujar);
     glutSpecialFunc(tecladoEspecial);  // Registrar función para teclas especiales
@@ -19,7 +18,7 @@ int main(int argc, char** argv){
     glutKeyboardFunc(teclado);  // Registrar función para teclas normales
     glutKeyboardUpFunc(liberarTecla);  // Registrar función para liberar teclas normales
 
-    glutTimerFunc(16, actualizarAsteroide, 0);  // Llamar a la función de actualización del asteroide cada 16 ms
+    glutTimerFunc(16, actualizarAsteroide, 0);  // Llamar a la función de actualización de los asteroides cada 16 ms
     glutTimerFunc(16, actualizar, 0);  // Llamar a la función de actualización del juego cada 16 ms (~60 FPS)
 
     // Inicializar disparos y otros elementos
@@ -33,4 +32,3 @@ int main(int argc, char** argv){
     glutMainLoop();
     return 0;
 }
-
