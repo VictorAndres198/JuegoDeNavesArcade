@@ -55,39 +55,81 @@ void naveespacial() {
     glPushMatrix();
     glTranslatef(mover_x, mover_y, 0);
 
-    glColor3f(1.0f, 0.0f, 0.0f);
+    // Cuerpo principal más delgado de color azul
+    glColor3f(0.2f, 0.3f, 0.9f);
     glBegin(GL_QUADS);
-        glVertex2f(-1.5f, 1.0f);
-        glVertex2f(1.5f, 1.0f);
-        glVertex2f(1.5f, 2.0f);
-        glVertex2f(-1.5f, 2.0f);
+        glVertex2f(-0.8f, 0.0f);
+        glVertex2f(0.8f, 0.0f);
+        glVertex2f(0.6f, 3.0f);
+        glVertex2f(-0.6f, 3.0f);
     glEnd();
 
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glBegin(GL_QUADS);
-        glVertex2f(-0.5f, 0.0f);
-        glVertex2f(0.5f, 0.0f);
-        glVertex2f(0.5f, 4.0f);
-        glVertex2f(-0.5f, 4.0f);
+    // Ala izquierda
+    glColor3f(0.6f, 0.6f, 0.6f);  // Gris oscuro o plata
+    glBegin(GL_TRIANGLES);
+        glVertex2f(-2.2f, -0.5f);
+        glVertex2f(-0.73f, 1.0f);
+        glVertex2f(-0.666f, 2.0f);
     glEnd();
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+    // Ala derecha
+    glBegin(GL_TRIANGLES);
+        glVertex2f(2.2f, -0.5f);
+        glVertex2f(0.73f, 1.0f);
+        glVertex2f(0.666f, 2.0f);
+    glEnd();
+
+    // Parte frontal triangular
+    glColor3f(0.0f, 0.5f, 1.0f);  // Azul claro brillante
+    glBegin(GL_TRIANGLES);
+        glVertex2f(-0.6f, 3.0f);
+        glVertex2f(0.6f, 3.0f);
+        glVertex2f(0.0f, 3.3f);
+    glEnd();
+
+    // Propulsor medio
+    glColor3f(0.0f, 0.5f, 1.0f);  // Azul claro brillante
+    glBegin(GL_TRIANGLES);
+        glVertex2f(-0.3f, 0.0f);
+        glVertex2f(0.3f, 0.0f);
+        glVertex2f(0.0f, -0.5f);
+    glEnd();
+    // Propulsor derecho
+    glBegin(GL_TRIANGLES);
+        glVertex2f(0.3f, 0.0f);
+        glVertex2f(0.8f, 0.0f);
+        glVertex2f(0.55f, -0.5f);
+    glEnd();
+    // Propulsor izquierdo
+    glBegin(GL_TRIANGLES);
+         glVertex2f(-0.3f, 0.0f);
+         glVertex2f(-0.8f, 0.0f);
+         glVertex2f(-0.55f, -0.5f);
+    glEnd();
+
+
+    // Ventana en el centro
+    glColor3f(0.7f, 0.9f, 1.0f);  // Azul claro
     glBegin(GL_QUADS);
-        glVertex2f(-0.25f, 2.5f);
-        glVertex2f(0.25f, 2.5f);
-        glVertex2f(0.25f, 3.5f);
-        glVertex2f(-0.25f, 3.5f);
+        glVertex2f(-0.3f, 1.0f);
+        glVertex2f(0.3f, 1.0f);
+        glVertex2f(0.2f, 2.0f);
+        glVertex2f(-0.2f, 2.0f);
     glEnd();
 
     glPopMatrix();
+
 }
+
+
+
 
 void asteroide(){
     glPushMatrix();
     glTranslatef(mover_x_asteroide, mover_y_asteroide, 0.0f);
     glRotatef(angulo_asteroide, 0.0f, 0.0f, 1.0f);
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(0.5f, 0.5f, 0.4f);  // Grisáceo con ligero tinte marrón
     glBegin(GL_POLYGON);
         for (const auto& vertice : verticesAsteroide) {
             glVertex2f(vertice.x, vertice.y);
