@@ -43,13 +43,67 @@ bool teclasEspeciales[256];
 
 //****************************************************************************
 
+//============================== PARTE DE ESTRELLAS===============================
+struct Estrella {
+    float x, y;
+    float velocidad_y;
+
+    Estrella(float x, float y, float velocidad_y)
+        : x(x), y(y), velocidad_y(velocidad_y) {}
+};
+std::vector<Estrella> estrellas;
+
+void generarEstrellas() {
+    estrellas.clear();
+    srand(time(NULL));  // Semilla para generar números aleatorios
+
+    int numEstrellas = rand() % 50 + 150;  // Generar entre 50 y 150 estrellas
+
+    for (int i = 0; i < numEstrellas; ++i) {
+        float x = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
+        float y = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
+        float velocidad_y = 0.17f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (0.05f - 0.02f)));
+
+        estrellas.push_back(Estrella(x, y, velocidad_y));
+    }
+}
+
+
+void dibujarEstrellas() {
+    glColor3f(1.0f, 1.0f, 1.0f);  // Color blanco para las estrellas
+
+    for (const auto& estrella : estrellas) {
+        glPushMatrix();
+        glTranslatef(estrella.x, estrella.y, 0.0f);
+        glBegin(GL_POINTS);
+            glVertex2f(0.0f, 0.0f);  // Dibuja un punto para representar la estrella
+        glEnd();
+        glPopMatrix();
+    }
+}
+
+void actualizarEstrellas(int valor) {
+    for (auto& estrella : estrellas) {
+        estrella.y -= estrella.velocidad_y;
+
+        // Si una estrella sale de la pantalla, se regenera arriba con una nueva posición x aleatoria
+        if (estrella.y < -20.0f) {
+            estrella.x = -20.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (20.0f - (-20.0f))));
+            estrella.y = 20.0f;
+        }
+    }
+
+    glutPostRedisplay();
+    glutTimerFunc(16, actualizarEstrellas, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
+}
+
 
 //============== PARTE DE DISPAROS =====================
 
 Disparo disparos[MAX_DISPAROS];  // Arreglo de disparos
 
 void dibujarDisparos() {
-    glColor3f(1.0f, 1.0f, 1.0f);  // Color blanco para los disparos
+	glColor3f(0.5f, 0.0f, 0.5f);  // Color morado oscuro para los disparos
 
     for (int i = 0; i < MAX_DISPAROS; ++i) {
         if (disparos[i].activo) {

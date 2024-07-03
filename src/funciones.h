@@ -23,7 +23,7 @@ extern int puntaje;
 extern int vidas;
 
 void generarAsteroides();
-
+void generarEstrellas();   // Generar estrellas
 
 void actualizar(int valor);
 void teclado(unsigned char key, int x, int y);
@@ -43,4 +43,7 @@ void actualizarAsteroide(int valor);
 void teclado(unsigned char key, int x, int y);  // Declaración de teclado
 void dibujarDisparos();
 void actualizarDisparos(int valor);
+
+void actualizarEstrellas(int valor);
+void dibujarEstrellas();
 #endif

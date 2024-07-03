@@ -19,6 +19,7 @@ int main(int argc, char** argv){
     glutKeyboardUpFunc(liberarTecla);  // Registrar función para liberar teclas normales
 
     glutTimerFunc(16, actualizarAsteroide, 0);  // Llamar a la función de actualización de los asteroides cada 16 ms
+    glutTimerFunc(16, actualizarEstrellas, 0);  // Timer para estrellas
     glutTimerFunc(16, actualizar, 0);  // Llamar a la función de actualización del juego cada 16 ms (~60 FPS)
 
     // Inicializar disparos y otros elementos

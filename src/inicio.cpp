@@ -5,6 +5,7 @@ void Inicializar(){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-20.0, 20.0, -20.0, 20.0, -1.0, 1.0);
+    generarEstrellas();  // Generar las estrellas al iniciar
     // Inicializar todos los disparos como inactivos
     for (int i = 0; i < MAX_DISPAROS; ++i) {
         disparos[i].activo = false;
@@ -13,11 +14,11 @@ void Inicializar(){
 
 void Dibujar(){
     glClear(GL_COLOR_BUFFER_BIT);
-    planoCartesiano();
+    //planoCartesiano();
+    dibujarEstrellas();
     naveespacial();
     asteroide();
     dibujarDisparos();
-
     // Dibujar puntaje
     glColor3f(1.0f, 1.0f, 1.0f);  // Color blanco
     glRasterPos2f(-18.0f, 18.0f);  // Posición del texto
