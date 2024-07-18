@@ -30,6 +30,11 @@ float velocidad_y_asteroide = 0.0f;  // Declarar la velocidad de bajada del aste
 // PARTE DE MOVIMIENTO
 float mover_x = 0;
 float mover_y = -15;
+
+float angulo_nave = 0.0f;  // Ángulo de rotación de la nave
+bool moviendo_izquierda = false;
+bool moviendo_derecha = false;
+
 //// *****************
 
 
@@ -149,20 +154,31 @@ void liberarTeclaEspecial(int key, int x, int y) {
 
 void actualizar(int valor) {
     // Movimiento más fluido de la nave
-    if (teclasEspeciales[GLUT_KEY_RIGHT] && mover_x < 18.0f) mover_x += 0.5f;
-    if (teclasEspeciales[GLUT_KEY_LEFT] && mover_x > -18.0f) mover_x -= 0.5f;
-    if (teclasEspeciales[GLUT_KEY_UP] && mover_y < 16.5f) mover_y += 0.5f;
-    if (teclasEspeciales[GLUT_KEY_DOWN] && mover_y > -19.0f) mover_y -= 0.5f;
+    moviendo_derecha = false;
+    moviendo_izquierda = false;
+
+    if (teclasEspeciales[GLUT_KEY_RIGHT] && mover_x < 18.0f) {
+        mover_x += 0.5f;
+        moviendo_derecha = true;
+    }
+    if (teclasEspeciales[GLUT_KEY_LEFT] && mover_x > -18.0f) {
+        mover_x -= 0.5f;
+        moviendo_izquierda = true;
+    }
+    if (teclasEspeciales[GLUT_KEY_UP] && mover_y < 18.0f) {
+        mover_y += 0.5f;
+    }
+    if (teclasEspeciales[GLUT_KEY_DOWN] && mover_y > -18.0f) {
+        mover_y -= 0.5f;
+    }
 
     // Disparar cuando se presiona la barra espaciadora
     if (teclas[' ']) disparar();
 
-    // Volver a dibujar la escena
     glutPostRedisplay();
-
-    // Configurar la próxima llamada a esta función
-    glutTimerFunc(16, actualizar, 0);  // Llamar de nuevo a esta función cada 16 ms (~60 FPS)
+    glutTimerFunc(16, actualizar, 0); // Actualización cada ~16ms para 60fps
 }
+
 
 //*******************************************
 
@@ -248,38 +264,57 @@ void traslado(int key, int x, int y){
 
 void naveespacial() {
     glPushMatrix();
-    glTranslatef(mover_x, mover_y, 0);
+    glTranslatef(mover_x, mover_y, 0.0f);
+
+    // Determinar la rotación basada en la dirección de movimiento
+    if (moviendo_derecha) {
+        angulo_nave = -30.0f;  // Mayor inclinación hacia la izquierda
+    } else if (moviendo_izquierda) {
+        angulo_nave = 30.0f;   // Mayor inclinación hacia la derecha
+    } else {
+        angulo_nave = 0.0f;    // Sin inclinación
+    }
+
+    // Aplicar la rotación
+    glRotatef(angulo_nave, 0.0f, 0.0f, 1.0f);
 
     // Cuerpo principal más delgado de color azul
     glColor3f(0.2f, 0.3f, 0.9f);
     glBegin(GL_QUADS);
-        glVertex2f(-0.8f, 0.0f);
-        glVertex2f(0.8f, 0.0f);
-        glVertex2f(0.6f, 3.0f);
-        glVertex2f(-0.6f, 3.0f);
+        glVertex3f(-0.8f, 0.0f, 0.0f);
+        glVertex3f(0.8f, 0.0f, 0.0f);
+        glVertex3f(-0.6f, 3.0f, 0.0f);
+        glVertex3f(0.6f, 3.0f, 0.0f);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    	glVertex3f(0.6f, 3.0f, 0.0f);
+    	glVertex3f(-0.6f, 3.0f, 0.0f);
+    	glVertex3f(0.8f, 0.0f, 0.0f);
+     	glVertex3f(-0.8f, 0.0f, 0.0f);
     glEnd();
 
     // Ala izquierda
     glColor3f(0.6f, 0.6f, 0.6f);  // Gris oscuro o plata
     glBegin(GL_TRIANGLES);
-        glVertex2f(-2.2f, -0.5f);
-        glVertex2f(-0.73f, 1.0f);
-        glVertex2f(-0.666f, 2.0f);
+        glVertex3f(-2.2f, -0.5f, 0.0f);
+        glVertex3f(-0.73f, 1.0f, 0.0f);
+        glVertex3f(-0.666f, 2.0f, 0.0f);
     glEnd();
 
     // Ala derecha
     glBegin(GL_TRIANGLES);
-        glVertex2f(2.2f, -0.5f);
-        glVertex2f(0.73f, 1.0f);
-        glVertex2f(0.666f, 2.0f);
+        glVertex3f(2.2f, -0.5f, 0.0f);
+        glVertex3f(0.73f, 1.0f, 0.0f);
+        glVertex3f(0.666f, 2.0f, 0.0f);
     glEnd();
 
     // Parte frontal triangular
     glColor3f(0.0f, 0.5f, 1.0f);  // Azul claro brillante
     glBegin(GL_TRIANGLES);
-        glVertex2f(-0.6f, 3.0f);
-        glVertex2f(0.6f, 3.0f);
-        glVertex2f(0.0f, 3.3f);
+        glVertex3f(-0.6f, 3.0f, 0.0f);
+        glVertex3f(0.6f, 3.0f, 0.0f);
+        glVertex3f(0.0f, 3.3f, 0.0f);
     glEnd();
 
     // Propulsor medio
@@ -289,9 +324,9 @@ void naveespacial() {
         glColor3f(0.0f, 0.0f, 0.0f);  // Negro (propulsor apagado)
     }
     glBegin(GL_TRIANGLES);
-        glVertex2f(-0.2f, -0.5f);
-        glVertex2f(0.2f, -0.5f);
-        glVertex2f(0.0f, -1.0f);
+        glVertex3f(-0.2f, -0.5f, 0.0f);
+        glVertex3f(0.2f, -0.5f, 0.0f);
+        glVertex3f(0.0f, -1.0f, 0.0f);
     glEnd();
 
     // Propulsor derecho
@@ -303,9 +338,9 @@ void naveespacial() {
         glColor3f(0.0f, 0.0f, 0.0f);  // Negro (propulsor apagado)
     }
     glBegin(GL_TRIANGLES);
-        glVertex2f(0.4f, -0.5f);
-        glVertex2f(0.7f, -0.5f);
-        glVertex2f(0.55f, -1.0f);
+        glVertex3f(0.4f, -0.5f, 0.0f);
+        glVertex3f(0.7f, -0.5f, 0.0f);
+        glVertex3f(0.55f, -1.0f, 0.0f);
     glEnd();
 
     // Propulsor izquierdo
@@ -317,47 +352,46 @@ void naveespacial() {
         glColor3f(0.0f, 0.0f, 0.0f);  // Negro (propulsor apagado)
     }
     glBegin(GL_TRIANGLES);
-         glVertex2f(-0.4f, -0.5f);
-         glVertex2f(-0.7f, -0.5f);
-         glVertex2f(-0.55f, -1.0f);
+        glVertex3f(-0.4f, -0.5f, 0.0f);
+        glVertex3f(-0.7f, -0.5f, 0.0f);
+        glVertex3f(-0.55f, -1.0f, 0.0f);
     glEnd();
-
 
     // Ventana en el centro
     glColor3f(0.7f, 0.9f, 1.0f);  // Azul claro
     glBegin(GL_QUADS);
-        glVertex2f(-0.3f, 1.0f);
-        glVertex2f(0.3f, 1.0f);
-        glVertex2f(0.2f, 2.0f);
-        glVertex2f(-0.2f, 2.0f);
+        glVertex3f(-0.3f, 1.0f, 0.0f);
+        glVertex3f(0.3f, 1.0f, 0.0f);
+        glVertex3f(0.2f, 2.0f, 0.0f);
+        glVertex3f(-0.2f, 2.0f, 0.0f);
     glEnd();
 
-
     // Ventanas en la parte inferior
-    	glColor3f(0.6f, 0.6f, 0.6f);  // Azul claro
-        glBegin(GL_QUADS);
-            glVertex2f(-0.3f, -0.0f);
-            glVertex2f(0.3f, -0.0f);
-            glVertex2f(0.2f, -0.5f);
-            glVertex2f(-0.2f, -0.5f);
-        glEnd();
+    glColor3f(0.6f, 0.6f, 0.6f);  // Azul claro
+    glBegin(GL_QUADS);
+        glVertex3f(-0.3f, -0.0f, 0.0f);
+        glVertex3f(0.3f, -0.0f, 0.0f);
+        glVertex3f(0.2f, -0.5f, 0.0f);
+        glVertex3f(-0.2f, -0.5f, 0.0f);
+    glEnd();
 
-        glBegin(GL_QUADS);
-            glVertex2f(-0.8f, -0.0f);
-            glVertex2f(-0.3f, -0.0f);
-            glVertex2f(-0.4f, -0.5f);
-            glVertex2f(-0.7f, -0.5f);
-        glEnd();
+    glBegin(GL_QUADS);
+        glVertex3f(-0.8f, -0.0f, 0.0f);
+        glVertex3f(-0.3f, -0.0f, 0.0f);
+        glVertex3f(-0.4f, -0.5f, 0.0f);
+        glVertex3f(-0.7f, -0.5f, 0.0f);
+    glEnd();
 
-        glBegin(GL_QUADS);
-            glVertex2f(0.8f, -0.0f);
-            glVertex2f(0.3f, -0.0f);
-            glVertex2f(0.4f, -0.5f);
-            glVertex2f(0.7f, -0.5f);
-        glEnd();
+    glBegin(GL_QUADS);
+        glVertex3f(0.8f, -0.0f, 0.0f);
+        glVertex3f(0.3f, -0.0f, 0.0f);
+        glVertex3f(0.4f, -0.5f, 0.0f);
+        glVertex3f(0.7f, -0.5f, 0.0f);
+    glEnd();
 
     glPopMatrix();
 }
+
 
 
 
@@ -370,13 +404,14 @@ void asteroide() {
         glColor3f(0.5f, 0.5f, 0.4f);  // Grisáceo con ligero tinte marrón
         glBegin(GL_POLYGON);
             for (const auto& vertice : ast.vertices) {
-                glVertex2f(vertice.x, vertice.y);
+                glVertex3f(vertice.x, vertice.y, 0.0f);
             }
         glEnd();
 
         glPopMatrix();
     }
 }
+
 
 // Función para generar asteroides
 void generarAsteroides() {
