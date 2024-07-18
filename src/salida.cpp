@@ -404,7 +404,7 @@ void asteroide() {
         glColor3f(0.5f, 0.5f, 0.4f);  // Grisáceo con ligero tinte marrón
         glBegin(GL_POLYGON);
             for (const auto& vertice : ast.vertices) {
-                glVertex3f(vertice.x, vertice.y, 0.0f);
+                glVertex2f(vertice.x, vertice.y);
             }
         glEnd();
 

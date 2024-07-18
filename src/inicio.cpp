@@ -36,4 +36,3 @@ void Dibujar(){
 
     glFlush();
 }
-
